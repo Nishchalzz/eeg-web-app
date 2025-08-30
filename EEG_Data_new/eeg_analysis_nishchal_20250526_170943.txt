@@ -1,0 +1,23 @@
+EEG Analysis Report for Patient nishchal
+Analysis Date and Time: 2025-05-26 17:09:43
+
+Recording Date and Time: 2025-05-26 17:09:32
+Recording Duration: 10 seconds
+
+Frequency Band Powers:
+Delta: 1.085824
+Theta: 0.096333
+Alpha: 0.038987
+Beta: 0.181636
+Gamma: 0.088492
+
+Theta/Alpha ratio: 2.47
+Spike count: 46
+Spike rate: 3.96 spikes/second
+
+Basic Interpretation:
+- Elevated Theta/Alpha ratio may indicate abnormal brain activity
+- Elevated spike rate detected
+
+Note: This is a simplified analysis and should not be used for clinical diagnosis.
+Please consult with a qualified medical professional for proper interpretation.

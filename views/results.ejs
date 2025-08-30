@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EEG Analysis Results</title>
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #000000;
+        color: #e0e0e0;
+        margin: 0;
+        padding: 0;
+        position: relative;
+        overflow-x: hidden;
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: radial-gradient(
+          white,
+          rgba(255, 255, 255, 0.2) 2px,
+          transparent 2px
+        );
+        background-size: 100px 100px;
+        background-position: 0 0, 50px 50px;
+        opacity: 0.3;
+        z-index: -1;
+      }
+
+      .planet {
+        position: fixed;
+        width: 600px;
+        height: 600px;
+        border-radius: 50%;
+        background: linear-gradient(45deg, #0a4977, #0077cc);
+        top: 10%;
+        right: -200px;
+        z-index: -1;
+        opacity: 0.5;
+        box-shadow: 0 0 100px 20px rgba(0, 119, 204, 0.3);
+      }
+
+      .waves {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 200px;
+        background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320'%3E%3Cpath fill='%23073f63' d='M0,224L60,213.3C120,203,240,181,360,186.7C480,192,600,224,720,224C840,224,960,192,1080,186.7C1200,181,1320,203,1380,213.3L1440,224L1440,320L1380,320C1320,320,1200,320,1080,320C960,320,840,320,720,320C600,320,480,320,360,320C240,320,120,320,60,320L0,320Z'%3E%3C/path%3E%3C/svg%3E")
+          repeat-x;
+        background-size: contain;
+        z-index: -1;
+        animation: waveMove 20s linear infinite;
+      }
+
+      @keyframes waveMove {
+        from {
+          background-position-x: 0;
+        }
+        to {
+          background-position-x: 1440px;
+        }
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+        animation: fadeIn 1s ease-in-out;
+        position: relative;
+        z-index: 1;
+      }
+
+      .glass-panel {
+        background-color: rgba(20, 20, 30, 0.7);
+        backdrop-filter: blur(10px);
+        border-radius: 12px;
+        border: 1px solid rgba(66, 153, 225, 0.2);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        padding: 30px;
+        margin-bottom: 40px;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      @keyframes slideUp {
+        from {
+          transform: translateY(50px);
+          opacity: 0;
+        }
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+
+      @keyframes glowPulse {
+        0% {
+          text-shadow: 0 0 5px rgba(0, 170, 255, 0.5);
+        }
+        50% {
+          text-shadow: 0 0 20px rgba(0, 170, 255, 0.8),
+            0 0 30px rgba(0, 170, 255, 0.6);
+        }
+        100% {
+          text-shadow: 0 0 5px rgba(0, 170, 255, 0.5);
+        }
+      }
+
+      @keyframes borderGlow {
+        0% {
+          box-shadow: 0 0 5px rgba(0, 170, 255, 0.5);
+        }
+        50% {
+          box-shadow: 0 0 15px rgba(0, 170, 255, 0.8);
+        }
+        100% {
+          box-shadow: 0 0 5px rgba(0, 170, 255, 0.5);
+        }
+      }
+
+      header {
+        text-align: center;
+        margin-bottom: 30px;
+        animation: slideUp 0.8s ease-out;
+      }
+
+      h1 {
+        color: #00aaff;
+        margin: 0;
+        padding-bottom: 10px;
+        font-size: 42px;
+        letter-spacing: 2px;
+        font-weight: 600;
+        animation: glowPulse 3s infinite;
+      }
+
+      header p {
+        color: #7dd3fc;
+        margin: 10px 0 0;
+        font-size: 1.1rem;
+      }
+
+      main {
+        display: grid;
+        gap: 20px;
+      }
+
+      .card {
+        background-color: rgba(13, 25, 40, 0.7);
+        border-radius: 8px;
+        border: 1px solid rgba(66, 153, 225, 0.2);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        overflow: hidden;
+        padding: 20px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        animation: slideUp 0.8s ease-out;
+        animation-fill-mode: both;
+      }
+
+      .card:nth-child(1) {
+        animation-delay: 0.1s;
+      }
+      .card:nth-child(2) {
+        animation-delay: 0.2s;
+      }
+      .card:nth-child(3) {
+        animation-delay: 0.3s;
+      }
+      .card:nth-child(4) {
+        animation-delay: 0.4s;
+      }
+      .card:nth-child(5) {
+        animation-delay: 0.5s;
+      }
+
+      .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 16px rgba(0, 119, 204, 0.3);
+        animation: borderGlow 2s infinite;
+      }
+
+      h2 {
+        color: #00aaff;
+        margin-top: 0;
+        margin-bottom: 15px;
+        font-size: 1.5rem;
+        border-bottom: 1px solid rgba(66, 153, 225, 0.3);
+        padding-bottom: 10px;
+      }
+
+      .image-container {
+        background-color: rgba(10, 20, 30, 0.5);
+        border-radius: 4px;
+        padding: 10px;
+        text-align: center;
+        border: 1px solid rgba(66, 153, 225, 0.2);
+        transition: all 0.3s ease;
+      }
+
+      .eeg-image {
+        max-width: 100%;
+        height: auto;
+        border-radius: 4px;
+        animation: borderGlow 4s infinite;
+      }
+
+      pre {
+        background-color: rgba(10, 20, 30, 0.5);
+        border-radius: 4px;
+        padding: 15px;
+        overflow-x: auto;
+        color: #e0e0e0;
+        font-family: "Courier New", monospace;
+        font-size: 14px;
+        line-height: 1.5;
+        border: 1px solid rgba(66, 153, 225, 0.2);
+      }
+
+      .report {
+        border-left: 3px solid #00aaff;
+      }
+
+      .output {
+        border-left: 3px solid #00ccff;
+      }
+
+      .error {
+        color: #ff6b6b;
+        font-style: italic;
+      }
+
+      a.btn-download,
+      a.btn-secondary {
+        display: inline-block;
+        padding: 10px 20px;
+        border-radius: 30px;
+        text-decoration: none;
+        font-weight: bold;
+        transition: all 0.3s ease;
+        margin-bottom: 15px;
+        text-align: center;
+      }
+
+      a.btn-download {
+        background-color: rgba(0, 119, 204, 0.7);
+        color: white;
+        border: 1px solid rgba(66, 153, 225, 0.5);
+      }
+
+      a.btn-download:hover {
+        background-color: rgba(0, 149, 255, 0.8);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 119, 204, 0.4);
+      }
+
+      a.btn-secondary {
+        background-color: rgba(0, 191, 255, 0.7);
+        color: white;
+        border: 1px solid rgba(66, 153, 225, 0.5);
+      }
+
+      a.btn-secondary:hover {
+        background-color: rgba(0, 213, 255, 0.8);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 191, 255, 0.4);
+      }
+
+      .collapsible h2 {
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .collapsible h2::after {
+        content: "▼";
+        font-size: 0.8rem;
+        transition: transform 0.3s ease;
+        color: #00aaff;
+      }
+
+      .collapsible.active h2::after {
+        transform: rotate(180deg);
+      }
+
+      .collapsible-content {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease;
+      }
+
+      .collapsible.active .collapsible-content {
+        max-height: 1000px;
+      }
+
+      .scroll-indicator {
+        position: absolute;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        animation: bounce 2s infinite;
+        color: #00aaff;
+        font-size: 24px;
+      }
+
+      @keyframes bounce {
+        0%,
+        20%,
+        50%,
+        80%,
+        100% {
+          transform: translateY(0);
+        }
+        40% {
+          transform: translateY(-20px);
+        }
+        60% {
+          transform: translateY(-10px);
+        }
+      }
+
+      footer {
+        text-align: center;
+        margin-top: 30px;
+        padding: 20px 0;
+        color: #777;
+        font-size: 14px;
+        animation: fadeIn 1s ease-in-out 1s both;
+      }
+
+      /* Chat styles */
+      .chat-container {
+        margin-top: 20px;
+        background-color: rgba(13, 25, 40, 0.7);
+        border-radius: 8px;
+        border: 1px solid rgba(66, 153, 225, 0.3);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        overflow: hidden;
+        animation: slideUp 0.8s ease-out;
+        animation-delay: 0.6s;
+        animation-fill-mode: both;
+      }
+
+      #chat-output {
+        height: 200px;
+        overflow-y: auto;
+        padding: 15px;
+        background-color: rgba(10, 20, 30, 0.5);
+        border-bottom: 1px solid rgba(66, 153, 225, 0.2);
+      }
+
+      #chat-form {
+        display: flex;
+        padding: 10px;
+      }
+
+      #chat-input {
+        flex: 1;
+        padding: 10px 15px;
+        border: none;
+        border-radius: 30px;
+        background-color: rgba(30, 40, 60, 0.8);
+        color: #e0e0e0;
+        margin-right: 10px;
+        border: 1px solid rgba(66, 153, 225, 0.2);
+      }
+
+      #chat-input:focus {
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(0, 170, 255, 0.5);
+      }
+
+      #chat-form button {
+        background-color: rgba(0, 119, 204, 0.7);
+        color: white;
+        border: none;
+        border-radius: 30px;
+        padding: 10px 20px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: all 0.3s ease;
+        border: 1px solid rgba(66, 153, 225, 0.5);
+      }
+
+      #chat-form button:hover {
+        background-color: rgba(0, 149, 255, 0.8);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 119, 204, 0.4);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="planet"></div>
+    <div class="waves"></div>
+
+    <div class="container">
+      <div class="glass-panel">
+        <header>
+          <h1>EEG Analysis Results</h1>
+          <p>
+            Patient ID: <%= patientId %> | Recording Duration: <%= duration %>
+            seconds
+          </p>
+        </header>
+
+        <main>
+          <div class="card">
+            <h2>EEG Visualization</h2>
+            <% if (imageFile) { %>
+            <div class="image-container">
+              <img
+                src="/eeg_data/<%= imageFile %>"
+                alt="EEG Analysis Graph"
+                class="eeg-image"
+              />
+            </div>
+            <% } else { %>
+            <p class="error">
+              No visualization generated. See output for details.
+            </p>
+            <% } %>
+          </div>
+
+          <div class="card">
+            <h2>Download Files</h2>
+            <% if (edfFile) { %>
+            <p>
+              <a href="/eeg_data/<%= edfFile %>" download class="btn-download"
+                >Download EDF File</a
+              >
+            </p>
+            <% } %> <% if (imageFile) { %>
+            <p>
+              <a href="/eeg_data/<%= imageFile %>" download class="btn-download"
+                >Download EEG Visualization</a
+              >
+            </p>
+            <% } %>
+            <p><a href="/" class="btn-secondary">Start New Analysis</a></p>
+          </div>
+
+          <div class="card collapsible">
+            <h2>System Output</h2>
+            <div class="collapsible-content">
+              <pre class="output"><%= pythonOutput %></pre>
+            </div>
+          </div>
+
+          <div class="card">
+            <h2>Ask About Results</h2>
+            <div class="chat-container">
+              <div id="chat-output"></div>
+              <form id="chat-form" data-page="recording">
+                <input
+                  type="text"
+                  id="chat-input"
+                  placeholder="Ask about EEG analysis..."
+                />
+                <button type="submit">Send</button>
+              </form>
+            </div>
+          </div>
+        </main>
+      </div>
+
+      <footer>
+        <p>&copy; 2025 EEG Analysis System</p>
+      </footer>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const collapsibles = document.querySelectorAll(".collapsible");
+
+        collapsibles.forEach((item) => {
+          const header = item.querySelector("h2");
+
+          header.addEventListener("click", () => {
+            item.classList.toggle("active");
+          });
+        });
+
+        setTimeout(() => {
+          document.querySelector(".collapsible").classList.add("active");
+        }, 1000);
+      });
+    </script>
+    <script src="/js/main.js"></script>
+    <script>
+      document
+        .getElementById("stop-recording")
+        .addEventListener("click", async function () {
+          const eegData = getEEGData();
+          const response = await fetch("/chat", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              userInput: "Analyze this EEG data",
+              pageType: "recording",
+              eegData,
+            }),
+          });
+          const data = await response.json();
+          document.getElementById(
+            "chat-output"
+          ).innerHTML += `<p><strong>AI:</strong> ${data.reply}</p>`;
+        });
+
+      function getEEGData() {
+        return {
+          channels: [
+            "Fp1",
+            "Fp2",
+            "F3",
+            "F4",
+            "C3",
+            "C4",
+            "P3",
+            "P4",
+            "O1",
+            "O2",
+          ],
+          samples: [],
+        };
+      }
+    </script>
+  </body>
+</html>

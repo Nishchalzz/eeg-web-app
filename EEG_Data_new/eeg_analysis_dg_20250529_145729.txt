@@ -1,0 +1,23 @@
+EEG Analysis Report for Patient dg
+Analysis Date and Time: 2025-05-29 14:57:29
+
+Recording Date and Time: 2025-05-29 14:57:19
+Recording Duration: 10 seconds
+
+Frequency Band Powers:
+Delta: 0.769025
+Theta: 0.081492
+Alpha: 0.008737
+Beta: 0.003412
+Gamma: 0.001256
+
+Theta/Alpha ratio: 9.33
+Spike count: 101
+Spike rate: 8.71 spikes/second
+
+Basic Interpretation:
+- Elevated Theta/Alpha ratio may indicate abnormal brain activity
+- Elevated spike rate detected
+
+Note: This is a simplified analysis and should not be used for clinical diagnosis.
+Please consult with a qualified medical professional for proper interpretation.

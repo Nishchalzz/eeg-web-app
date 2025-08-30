@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EEG Analysis System - Authentication</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+      :root {
+        --primary-color: #00a8ff;
+        --secondary-color: #7b68ee;
+        --accent-color: #00e676;
+        --dark-bg: #121212;
+        --card-bg: #1e1e1e;
+        --text-primary: #e0e0e0;
+        --text-secondary: #b0b0b0;
+        --shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        --transition: all 0.3s ease;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
+        color: var(--text-primary);
+        background: var(--dark-bg);
+        overflow-x: hidden;
+        height: 100vh;
+      }
+
+      .container {
+        width: 100%;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      #brain-canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+      }
+
+      .auth-container {
+        background-color: rgba(30, 30, 30, 0.85);
+        padding: 40px;
+        border-radius: 20px;
+        box-shadow: var(--shadow);
+        max-width: 500px;
+        width: 90%;
+        transform: translateY(0);
+        opacity: 1;
+        transition: var(--transition);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        z-index: 10;
+        position: relative;
+      }
+
+      .auth-header {
+        text-align: center;
+        margin-bottom: 30px;
+      }
+
+      h1 {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+        color: var(--primary-color);
+        text-shadow: 0 0 10px rgba(0, 168, 255, 0.3);
+      }
+
+      .auth-header p {
+        font-size: 1.1rem;
+        color: var(--text-secondary);
+      }
+
+      .tabs {
+        display: flex;
+        margin-bottom: 30px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .tab {
+        flex: 1;
+        text-align: center;
+        padding: 15px;
+        cursor: pointer;
+        color: var(--text-secondary);
+        transition: var(--transition);
+        font-weight: bold;
+        position: relative;
+      }
+
+      .tab.active {
+        color: var(--primary-color);
+      }
+
+      .tab.active::after {
+        content: "";
+        position: absolute;
+        bottom: -1px;
+        left: 0;
+        width: 100%;
+        height: 3px;
+        background-color: var(--primary-color);
+        border-radius: 3px 3px 0 0;
+      }
+
+      .form-content {
+        display: none;
+      }
+
+      .form-content.active {
+        display: block;
+      }
+
+      .form-group {
+        margin-bottom: 1.5rem;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: bold;
+        color: var(--text-secondary);
+      }
+
+      input[type="text"],
+      input[type="email"],
+      input[type="password"] {
+        width: 100%;
+        padding: 12px 15px;
+        border: 1px solid #333;
+        border-radius: 10px;
+        font-size: 1rem;
+        transition: var(--transition);
+        background-color: #2a2a2a;
+        color: var(--text-primary);
+      }
+
+      input[type="text"]:focus,
+      input[type="email"]:focus,
+      input[type="password"]:focus {
+        border-color: var(--primary-color);
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(0, 168, 255, 0.2);
+      }
+
+      .forgot-password {
+        text-align: right;
+        margin-top: -10px;
+        margin-bottom: 20px;
+      }
+
+      .forgot-password a {
+        color: var(--primary-color);
+        text-decoration: none;
+        font-size: 0.9rem;
+        transition: var(--transition);
+      }
+
+      .forgot-password a:hover {
+        text-decoration: underline;
+      }
+
+      .btn-primary {
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 50px;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: var(--transition);
+        text-decoration: none;
+        display: inline-block;
+        font-weight: bold;
+        width: 100%;
+        text-align: center;
+      }
+
+      .btn-primary:hover {
+        background-color: #0088cc;
+        transform: translateY(-2px);
+        box-shadow: 0 0 15px rgba(0, 168, 255, 0.4);
+      }
+
+      .wave {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 100px;
+        background: url('data:image/svg+xml;utf8,<svg viewBox="0 0 1200 120" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none"><path d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z" opacity=".25" fill="%2300a8ff"/><path d="M0,0V15.81C13,36.92,27.64,56.86,47.69,72.05,99.41,111.27,165,111,224.58,91.58c31.15-10.15,60.09-26.07,89.67-39.8,40.92-19,84.73-46,130.83-49.67,36.26-2.85,70.9,9.42,98.6,31.56,31.77,25.39,62.32,62,103.63,73,40.44,10.79,81.35-6.69,119.13-24.28s75.16-39,116.92-43.05c59.73-5.85,113.28,22.88,168.9,38.84,30.2,8.66,59,6.17,87.09-7.5,22.43-10.89,48-26.93,60.65-49.24V0Z" opacity=".5" fill="%2300a8ff"/><path d="M0,0V5.63C149.93,59,314.09,71.32,475.83,42.57c43-7.64,84.23-20.12,127.61-26.46,59-8.63,112.48,12.24,165.56,35.4C827.93,77.22,886,95.24,951.2,90c86.53-7,172.46-45.71,248.8-84.81V0Z" fill="%2300a8ff"/></svg>');
+        background-size: 1200px 100px;
+        animation: wave 10s linear infinite;
+        opacity: 0.3;
+      }
+
+      @keyframes wave {
+        0% {
+          background-position-x: 0;
+        }
+        100% {
+          background-position-x: 1200px;
+        }
+      }
+
+      .pulse {
+        position: absolute;
+        border-radius: 50%;
+        animation: pulse 2s ease-out infinite;
+        background-color: var(--accent-color);
+        opacity: 0.7;
+      }
+
+      @keyframes pulse {
+        0% {
+          transform: scale(0);
+          opacity: 0.7;
+        }
+        100% {
+          transform: scale(1);
+          opacity: 0;
+        }
+      }
+
+      .notification {
+        padding: 10px;
+        margin-bottom: 20px;
+        border-radius: 10px;
+        color: white;
+        text-align: center;
+        display: none;
+      }
+
+      .notification.error {
+        background-color: rgba(255, 0, 0, 0.2);
+        border: 1px solid rgba(255, 0, 0, 0.3);
+      }
+
+      .notification.success {
+        background-color: rgba(0, 230, 118, 0.2);
+        border: 1px solid rgba(0, 230, 118, 0.3);
+      }
+
+      .brain-pulse {
+        position: absolute;
+        width: 200px;
+        height: 200px;
+        border-radius: 50%;
+        background: radial-gradient(
+          circle,
+          rgba(0, 168, 255, 0.1) 0%,
+          rgba(0, 168, 255, 0) 70%
+        );
+        animation: brain-pulse 4s infinite ease-out;
+        z-index: 1;
+      }
+
+      @keyframes brain-pulse {
+        0% {
+          transform: scale(0.8);
+          opacity: 0.5;
+        }
+        50% {
+          transform: scale(1.2);
+          opacity: 0.2;
+        }
+        100% {
+          transform: scale(0.8);
+          opacity: 0.5;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <canvas id="brain-canvas"></canvas>
+      <div class="brain-pulse" style="top: 30%; left: 20%"></div>
+      <div class="brain-pulse" style="bottom: 20%; right: 15%"></div>
+
+      <div class="auth-container">
+        <div class="auth-header">
+          <h1>EEG Analysis System</h1>
+          <p>Welcome to the advanced neural monitoring platform</p>
+        </div>
+
+        <div id="notification" class="notification"></div>
+
+        <div class="tabs">
+          <div class="tab active" data-form="login">Login</div>
+          <div class="tab" data-form="signup">Sign Up</div>
+        </div>
+
+        <div class="form-content active" id="login-form">
+          <form id="login" action="/login" method="POST">
+            <div class="form-group">
+              <label for="login-email">Email:</label>
+              <input
+                type="email"
+                id="login-email"
+                name="email"
+                placeholder="your@email.com"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="login-password">Password:</label>
+              <input
+                type="password"
+                id="login-password"
+                name="password"
+                placeholder="Your password"
+                required
+              />
+            </div>
+
+            <div class="forgot-password">
+              <a href="/forgot-password">Forgot Password?</a>
+            </div>
+
+            <button type="submit" class="btn-primary">Login</button>
+          </form>
+        </div>
+
+        <div class="form-content" id="signup-form">
+          <form id="signup" action="/signup" method="POST">
+            <div class="form-group">
+              <label for="signup-name">Full Name:</label>
+              <input
+                type="text"
+                id="signup-name"
+                name="name"
+                placeholder="Your full name"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="signup-email">Email:</label>
+              <input
+                type="email"
+                id="signup-email"
+                name="email"
+                placeholder="your@email.com"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="signup-password">Password:</label>
+              <input
+                type="password"
+                id="signup-password"
+                name="password"
+                placeholder="Choose a password"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="signup-confirm-password">Confirm Password:</label>
+              <input
+                type="password"
+                id="signup-confirm-password"
+                name="confirmPassword"
+                placeholder="Confirm your password"
+                required
+              />
+            </div>
+
+            <button type="submit" class="btn-primary">Sign Up</button>
+          </form>
+        </div>
+      </div>
+      <div class="wave"></div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        // Tab functionality
+        const tabs = document.querySelectorAll(".tab");
+        const formContents = document.querySelectorAll(".form-content");
+
+        tabs.forEach((tab) => {
+          tab.addEventListener("click", () => {
+            const formId = tab.getAttribute("data-form");
+
+            // Remove active class from all tabs and forms
+            tabs.forEach((t) => t.classList.remove("active"));
+            formContents.forEach((form) => form.classList.remove("active"));
+
+            // Add active class to selected tab and form
+            tab.classList.add("active");
+            document.getElementById(`${formId}-form`).classList.add("active");
+          });
+        });
+
+        // Form submission handling
+        const loginForm = document.getElementById("login");
+        const signupForm = document.getElementById("signup");
+        const notification = document.getElementById("notification");
+
+        loginForm.addEventListener("submit", function (e) {
+          e.preventDefault();
+
+          const email = document.getElementById("login-email").value;
+          const password = document.getElementById("login-password").value;
+
+          fetch("/login", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ email, password }),
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              if (data.success) {
+                notification.textContent = "Login successful! Redirecting...";
+                notification.className = "notification success";
+                notification.style.display = "block";
+
+                setTimeout(() => {
+                  window.location.href = "/dashboard";
+                }, 1500);
+              } else {
+                notification.textContent =
+                  data.message ||
+                  "Login failed. Please check your credentials.";
+                notification.className = "notification error";
+                notification.style.display = "block";
+              }
+            })
+            .catch((error) => {
+              notification.textContent = "An error occurred. Please try again.";
+              notification.className = "notification error";
+              notification.style.display = "block";
+            });
+        });
+
+        signupForm.addEventListener("submit", function (e) {
+          e.preventDefault();
+
+          const name = document.getElementById("signup-name").value;
+          const email = document.getElementById("signup-email").value;
+          const password = document.getElementById("signup-password").value;
+          const confirmPassword = document.getElementById(
+            "signup-confirm-password"
+          ).value;
+
+          if (password !== confirmPassword) {
+            notification.textContent = "Passwords do not match.";
+            notification.className = "notification error";
+            notification.style.display = "block";
+            return;
+          }
+
+          fetch("/signup", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ name, email, password }),
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              if (data.success) {
+                notification.textContent =
+                  "Account created successfully! You can now login.";
+                notification.className = "notification success";
+                notification.style.display = "block";
+
+                // Switch to login tab
+                document.querySelector('.tab[data-form="login"]').click();
+              } else {
+                notification.textContent =
+                  data.message || "Signup failed. Please try again.";
+                notification.className = "notification error";
+                notification.style.display = "block";
+              }
+            })
+            .catch((error) => {
+              notification.textContent = "An error occurred. Please try again.";
+              notification.className = "notification error";
+              notification.style.display = "block";
+            });
+        });
+
+        // Initialize Brain visualization
+        const canvas = document.getElementById("brain-canvas");
+        const renderer = new THREE.WebGLRenderer({
+          canvas: canvas,
+          antialias: true,
+          alpha: true,
+        });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+
+        const scene = new THREE.Scene();
+
+        const camera = new THREE.PerspectiveCamera(
+          45,
+          window.innerWidth / window.innerHeight,
+          0.1,
+          1000
+        );
+        camera.position.z = 20;
+
+        const ambientLight = new THREE.AmbientLight(0x222222, 2);
+        scene.add(ambientLight);
+
+        const directionalLight = new THREE.DirectionalLight(0x00a8ff, 2);
+        directionalLight.position.set(10, 10, 10);
+        scene.add(directionalLight);
+
+        function createBrain() {
+          const brainGroup = new THREE.Group();
+
+          const hemisphereGeometry = new THREE.SphereGeometry(
+            5,
+            32,
+            32,
+            0,
+            Math.PI * 2,
+            0,
+            Math.PI / 2
+          );
+
+          const leftMaterial = new THREE.MeshPhongMaterial({
+            color: 0x00a8ff,
+            transparent: true,
+            opacity: 0.6,
+            wireframe: false,
+            emissive: 0x00a8ff,
+            emissiveIntensity: 0.2,
+          });
+          const leftHemisphere = new THREE.Mesh(
+            hemisphereGeometry,
+            leftMaterial
+          );
+          leftHemisphere.rotation.z = Math.PI;
+          leftHemisphere.position.x = -0.5;
+
+          const rightMaterial = new THREE.MeshPhongMaterial({
+            color: 0x7b68ee,
+            transparent: true,
+            opacity: 0.6,
+            wireframe: false,
+            emissive: 0x7b68ee,
+            emissiveIntensity: 0.2,
+          });
+          const rightHemisphere = new THREE.Mesh(
+            hemisphereGeometry,
+            rightMaterial
+          );
+          rightHemisphere.position.x = 0.5;
+
+          for (let i = 0; i < 100; i++) {
+            const lineGeometry = new THREE.BufferGeometry();
+
+            const x1 = (Math.random() - 0.5) * 10;
+            const y1 = (Math.random() - 0.5) * 10;
+            const z1 = (Math.random() - 0.5) * 10;
+
+            const x2 = (Math.random() - 0.5) * 10;
+            const y2 = (Math.random() - 0.5) * 10;
+            const z2 = (Math.random() - 0.5) * 10;
+
+            const r1 = Math.sqrt(x1 * x1 + y1 * y1 + z1 * z1);
+            const r2 = Math.sqrt(x2 * x2 + y2 * y2 + z2 * z2);
+
+            if (r1 < 5 && r2 < 5) {
+              const points = [
+                new THREE.Vector3(x1, y1, z1),
+                new THREE.Vector3(x2, y2, z2),
+              ];
+
+              lineGeometry.setFromPoints(points);
+
+              const lineMaterial = new THREE.LineBasicMaterial({
+                color: 0x00e676,
+                transparent: true,
+                opacity: 0.4,
+              });
+
+              const line = new THREE.Line(lineGeometry, lineMaterial);
+              brainGroup.add(line);
+            }
+          }
+
+          brainGroup.add(leftHemisphere);
+          brainGroup.add(rightHemisphere);
+
+          const pulsesGroup = new THREE.Group();
+          for (let i = 0; i < 40; i++) {
+            const geometry = new THREE.SphereGeometry(0.05, 8, 8);
+            const material = new THREE.MeshBasicMaterial({
+              color: 0x00e676,
+              transparent: true,
+              opacity: 0.8,
+            });
+
+            const pulse = new THREE.Mesh(geometry, material);
+
+            const theta = Math.random() * Math.PI * 2;
+            const phi = Math.random() * Math.PI;
+            const radius = Math.random() * 4.5;
+
+            pulse.position.x = radius * Math.sin(phi) * Math.cos(theta);
+            pulse.position.y = radius * Math.sin(phi) * Math.sin(theta);
+            pulse.position.z = radius * Math.cos(phi);
+
+            pulse.userData = {
+              speed: 0.02 + Math.random() * 0.05,
+              opacity: 0.3 + Math.random() * 0.7,
+              opacityDir: Math.random() > 0.5 ? 1 : -1,
+              scale: 0.8 + Math.random() * 0.4,
+            };
+
+            pulsesGroup.add(pulse);
+          }
+
+          brainGroup.add(pulsesGroup);
+          brainGroup.userData = { pulsesGroup: pulsesGroup };
+
+          return brainGroup;
+        }
+
+        const brain = createBrain();
+        scene.add(brain);
+
+        const starsGeometry = new THREE.BufferGeometry();
+        const starsMaterial = new THREE.PointsMaterial({
+          color: 0xffffff,
+          size: 0.1,
+          transparent: true,
+          opacity: 0.8,
+        });
+
+        const starsVertices = [];
+        for (let i = 0; i < 1000; i++) {
+          const x = (Math.random() - 0.5) * 100;
+          const y = (Math.random() - 0.5) * 100;
+          const z = (Math.random() - 0.5) * 100;
+          starsVertices.push(x, y, z);
+        }
+
+        starsGeometry.setAttribute(
+          "position",
+          new THREE.Float32BufferAttribute(starsVertices, 3)
+        );
+        const stars = new THREE.Points(starsGeometry, starsMaterial);
+        scene.add(stars);
+
+        function animate() {
+          requestAnimationFrame(animate);
+
+          brain.rotation.y += 0.003;
+          brain.rotation.x = Math.sin(Date.now() * 0.0005) * 0.1;
+
+          const pulses = brain.userData.pulsesGroup.children;
+          pulses.forEach((pulse) => {
+            pulse.material.opacity +=
+              pulse.userData.opacityDir * pulse.userData.speed;
+
+            const scale =
+              0.8 + 0.5 * Math.sin(Date.now() * 0.001 * pulse.userData.scale);
+            pulse.scale.set(scale, scale, scale);
+
+            if (pulse.material.opacity > 0.9) {
+              pulse.userData.opacityDir = -1;
+            } else if (pulse.material.opacity < 0.3) {
+              pulse.userData.opacityDir = 1;
+
+              if (Math.random() > 0.95) {
+                const theta = Math.random() * Math.PI * 2;
+                const phi = Math.random() * Math.PI;
+                const radius = Math.random() * 4.5;
+
+                pulse.position.x = radius * Math.sin(phi) * Math.cos(theta);
+                pulse.position.y = radius * Math.sin(phi) * Math.sin(theta);
+                pulse.position.z = radius * Math.cos(phi);
+              }
+            }
+          });
+
+          stars.rotation.y += 0.0002;
+
+          renderer.render(scene, camera);
+        }
+
+        animate();
+
+        window.addEventListener("resize", function () {
+          camera.aspect = window.innerWidth / window.innerHeight;
+          camera.updateProjectionMatrix();
+          renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+      });
+    </script>
+  </body>
+</html>

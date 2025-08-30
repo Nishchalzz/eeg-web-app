@@ -1,0 +1,22 @@
+EEG Analysis Report for Patient Antony  sir
+Analysis Date and Time: 2025-05-30 12:47:08
+
+Recording Date and Time: 2025-05-30 12:46:58
+Recording Duration: 10 seconds
+
+Frequency Band Powers:
+Delta: 0.167142
+Theta: 0.044219
+Alpha: 0.039534
+Beta: 0.058921
+Gamma: 0.024320
+
+Theta/Alpha ratio: 1.12
+Spike count: 68
+Spike rate: 5.89 spikes/second
+
+Basic Interpretation:
+- Elevated spike rate detected
+
+Note: This is a simplified analysis and should not be used for clinical diagnosis.
+Please consult with a qualified medical professional for proper interpretation.

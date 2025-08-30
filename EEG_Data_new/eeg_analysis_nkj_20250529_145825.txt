@@ -1,0 +1,23 @@
+EEG Analysis Report for Patient nkj
+Analysis Date and Time: 2025-05-29 14:58:25
+
+Recording Date and Time: 2025-05-29 14:58:15
+Recording Duration: 10 seconds
+
+Frequency Band Powers:
+Delta: 0.865795
+Theta: 0.328196
+Alpha: 0.086617
+Beta: 0.015317
+Gamma: 0.003489
+
+Theta/Alpha ratio: 3.79
+Spike count: 74
+Spike rate: 6.38 spikes/second
+
+Basic Interpretation:
+- Elevated Theta/Alpha ratio may indicate abnormal brain activity
+- Elevated spike rate detected
+
+Note: This is a simplified analysis and should not be used for clinical diagnosis.
+Please consult with a qualified medical professional for proper interpretation.

@@ -1,0 +1,22 @@
+EEG Analysis Report for Patient Shankar
+Analysis Date and Time: 2025-05-30 12:53:36
+
+Recording Date and Time: 2025-05-30 12:53:26
+Recording Duration: 10 seconds
+
+Frequency Band Powers:
+Delta: 0.519934
+Theta: 0.141683
+Alpha: 0.115020
+Beta: 0.178416
+Gamma: 0.069990
+
+Theta/Alpha ratio: 1.23
+Spike count: 47
+Spike rate: 4.07 spikes/second
+
+Basic Interpretation:
+- Elevated spike rate detected
+
+Note: This is a simplified analysis and should not be used for clinical diagnosis.
+Please consult with a qualified medical professional for proper interpretation.

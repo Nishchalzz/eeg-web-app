@@ -1,0 +1,23 @@
+EEG Analysis Report for Patient Chaitanya
+Analysis Date and Time: 2025-05-30 14:12:35
+
+Recording Date and Time: 2025-05-30 14:12:25
+Recording Duration: 10 seconds
+
+Frequency Band Powers:
+Delta: 0.291961
+Theta: 0.125203
+Alpha: 0.056739
+Beta: 0.184441
+Gamma: 0.045251
+
+Theta/Alpha ratio: 2.21
+Spike count: 52
+Spike rate: 4.50 spikes/second
+
+Basic Interpretation:
+- Elevated Theta/Alpha ratio may indicate abnormal brain activity
+- Elevated spike rate detected
+
+Note: This is a simplified analysis and should not be used for clinical diagnosis.
+Please consult with a qualified medical professional for proper interpretation.
